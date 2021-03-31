@@ -23,8 +23,15 @@
 
 // Initialize changeable global variables.
 uint8_t max_bright = 128;                                     // Overall brightness definition. It can be changed on the fly.
+struct CRGB leds[NUM_LEDS];      
 
-struct CRGB leds[NUM_LEDS];                                   // Initialize our LED array.
+void fastled_setup(){
+  LEDS.addLeds<LED_TYPE, LED_DT, COLOR_ORDER>(leds, NUM_LEDS);  // Use this for WS2801 or APA102
+  FastLED.setBrightness(max_bright);
+  FastLED.setMaxPowerInVoltsAndMilliamps(12, 500);                // FastLED 2.1 Power management set at 5V, 500mA
+}
+
+                             // Initialize our LED array.
 
 // Initialize global variables for sequences
 uint8_t thisdelay = 40;                                       // A delay value for the sequence(s)
@@ -63,6 +70,8 @@ void rainbow_effect_loop(){
   FastLED.show();
 }// ChangeMe()
 
+
+//*********************Palette effect*******************//
 CRGBPalette16 currentPalette(CRGB::Black);
 CRGBPalette16 targetPalette(PartyColors_p );
 TBlendType    currentBlending;       
@@ -123,3 +132,49 @@ void black_effect_loop(){
   fill_solid(leds, NUM_LEDS, CRGB::Black);                    // Just to be sure, let's really make it BLACK.
   FastLED.show();                         // Power managed display
 }
+//*********************Palette effect*******************//
+
+
+//********************dot beat***********************//
+
+uint8_t bpm = 30;
+uint8_t fadeval = 224;  
+
+void dot_beat_loop() {
+
+  uint8_t inner = beatsin8(bpm, NUM_LEDS/4, NUM_LEDS/4*3);    // Move 1/4 to 3/4
+  uint8_t outer = beatsin8(bpm, 0, NUM_LEDS-1);               // Move entire length
+  uint8_t middle = beatsin8(bpm, NUM_LEDS/3, NUM_LEDS/3*2);   // Move 1/3 to 2/3
+
+  leds[middle] = CRGB::Purple;
+  leds[inner] = CRGB::Blue;
+  leds[outer] = CRGB::Aqua;
+
+  EVERY_N_MILLISECONDS(thisdelay){
+    nscale8(leds,NUM_LEDS,fadeval);                             // Fade the entire array. Or for just a few LED's, use  nscale8(&leds[2], 5, fadeval);
+    FastLED.show();
+  }
+} // dot_beat()
+//*********************dot beat*************************//
+
+//************************blur***********************//
+void blur_loop() {
+
+  uint8_t blurAmount = dim8_raw( beatsin8(3,64, 192) );       // A sinewave at 3 Hz with values ranging from 64 to 192.
+  uint8_t  i = beatsin8(  9, 0, NUM_LEDS);
+  uint8_t  j = beatsin8( 7, 0, NUM_LEDS);
+  uint8_t  k = beatsin8(  5, 0, NUM_LEDS);
+  
+  // The color of each point shifts over time, each at a different speed.
+  uint16_t ms = millis();  
+  leds[(i+j)/2] = CHSV( ms / 29, 200, 255);
+  leds[(j+k)/2] = CHSV( ms / 41, 200, 255);
+  leds[(k+i)/2] = CHSV( ms / 73, 200, 255);
+  leds[(k+i+j)/3] = CHSV( ms / 53, 200, 255);
+
+  EVERY_N_MILLISECONDS(thisdelay){
+    blur1d( leds, NUM_LEDS, blurAmount);                        // Apply some blurring to whatever's already on the strip, which will eventually go black.
+    FastLED.show();
+  }
+} // loop()
+//***************************blur*************************//
