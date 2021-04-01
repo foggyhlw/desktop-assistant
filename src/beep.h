@@ -1,7 +1,7 @@
 #include "EasyBuzzer.h"
-unsigned int frequency = 4000;
-unsigned int rotate_duration = 5;
-unsigned int click_duration = 10;
+unsigned int frequency = 5000;
+unsigned int rotate_duration = 1;
+unsigned int click_duration = 5;
 unsigned int buzzer_pin = 12;
 
 void buzzer_setup(){

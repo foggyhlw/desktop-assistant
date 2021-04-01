@@ -4,7 +4,7 @@ unsigned long time_now1 = 0;
 unsigned long time_now2 = 0;
 
 #include <Wifi.h>
-
+#include "temp_humi.h"
 #include "beep.h"
 #include "ntp_time.h"
 
@@ -82,6 +82,8 @@ CHOOSE(screen_saver_mode, screensaverMenu, " -SCREEN", doNothing, noEvent, noSty
        , VALUE(" CHANGE", 0, doNothing, noEvent)
        , VALUE(" BILIBILI", 1, doNothing, noEvent)
        , VALUE(" DATETIME", 2, doNothing, noEvent)
+       , VALUE(" TEMPHUMI", 3, doNothing, noEvent)
+
       );
 
 //used to choose fastled effect
@@ -211,7 +213,7 @@ result screen_saver(menuOut &o, idleEvent e) {
     u8g2.setFont(defaultFont);
   }
   if (screen_saver_mode == TIME_MODE){
-    u8g2.setCursor(15,40);
+    u8g2.setCursor(30,40);
     u8g2.setFont(largeFont);
     if(timeinfo.tm_hour < 10){
       u8g2.print(0);
@@ -232,7 +234,18 @@ result screen_saver(menuOut &o, idleEvent e) {
     u8g2.print(" ");
     u8g2.println(&timeinfo, "%A");
     u8g2.setFont(defaultFont);
-
+  }
+  if (screen_saver_mode == TEMP_HUMI_MODE){
+    u8g2.setFont(mediumFont);
+    u8g2.setCursor(0,20);
+    u8g2.print("Temp: ");
+    u8g2.print(temperature);
+    u8g2.println(" °C");
+    u8g2.setCursor(0,40);
+    u8g2.print("Humi: ");
+    u8g2.println(" %");
+    u8g2.println(humidity);
+    u8g2.setFont(defaultFont);
   }
     // switch (e) {
     //   case idleStart: o.println("suspending menu!"); break;
@@ -282,15 +295,12 @@ void setup() {
   EEPROM.get(MONITOR_AUTO_CONTROL_ADDR,monitor_auto_control);
 
 //rotary and button cb
-  r.setChangedHandler(rotate);
-//  r.setLeftRotationHandler(leftrotatehandler);
-//  r.setRightRotationHandler(rightrotatehandler);
+  r.setChangedHandler(rotate_callback);
+  b.setTapHandler(click_callback);
+  b.setLongClickHandler(longclick_callback);
+  b.setDoubleClickHandler(doubleclick_callback);
 
-  b.setTapHandler(click);
-  b.setLongClickHandler(longclick);
-  b.setDoubleClickHandler(doubleclick);
   // out put device ssd1306
-
   SPI.begin();
   u8g2.begin();
   u8g2.setFont(defaultFont);
@@ -305,7 +315,9 @@ void setup() {
   // while(!WiFi.isConnected());
   buzzer_setup();
    //ntp 
+  dht_setup();
   ntp_setup();
+
   get_bilibili_fans(fans_num);
 
   fastled_setup();
@@ -321,6 +333,8 @@ void loop() {
         brightness = convert_lux_to_brightness(lux);
         update_brightness_cmd();
       }
+  //dht update period is the same as lux
+    dht_loop();
   }
   if(millis() > time_now2 + FANS_UPDATE_PERIOD){
     time_now2 = millis();
@@ -351,10 +365,9 @@ void loop() {
 }
 
 // on change
-void rotate(ESPRotary& r) {
+void rotate_callback(ESPRotary& r) {
 //   Serial.println(r.getPosition());
   buzzer_beep_rotate();
-
   if(r.getDirection() == RE_LEFT){
     reIn.registerEvent(RotaryEventIn::EventType::ROTARY_CW);
     if(nav.sleepTask){
@@ -371,20 +384,8 @@ void rotate(ESPRotary& r) {
   }
 }
 
-// on left or right rotation
-void showDirection(ESPRotary& r) {
-//  Serial.println(r.directionToString(r.getDirection()));
-}
-
-// void leftrotatehandler(ESPRotary& r){
-//   reIn.registerEvent(RotaryEventIn::EventType::ROTARY_CW);
-// }
-// void rightrotatehandler(ESPRotary& r){
-//   reIn.registerEvent(RotaryEventIn::EventType::ROTARY_CCW);
-// }
-
 // single click
-void click(Button2& btn) {
+void click_callback(Button2& btn) {
   buzzer_beep_click();
 
   reIn.registerEvent(RotaryEventIn::EventType::BUTTON_CLICKED);
@@ -392,13 +393,13 @@ void click(Button2& btn) {
 }
 
 // long click
-void longclick(Button2& btn) {
+void longclick_callback(Button2& btn) {
   // reIn.registerEvent(RotaryEventIn::EventType::BUTTON_LONG_PRESSED);
   nav.doNav(navCmd(escCmd));
   buzzer_beep_double_click();
 }
 
-void doubleclick(Button2& btn) {
+void doubleclick_callback(Button2& btn) {
   reIn.registerEvent(RotaryEventIn::EventType::BUTTON_DOUBLE_CLICKED);
   buzzer_beep_double_click();
 }
@@ -444,16 +445,16 @@ void save_monitor_control_mod(){
 }
 
 int convert_lux_to_brightness(int lux){
-  if(lux > 200){
-    return 4;
+  if(lux > 300){
+    return BRIGHTNESS_LEVEL4;
   }
   else if(lux > 100){
-    return 3;
+    return BRIGHTNESS_LEVEL3;
   }
-  else if( lux >20){
-    return 2;
+  else if(lux > 40){
+    return BRIGHTNESS_LEVEL2;
   }
   else{
-    return 1;
+    return BRIGHTNESS_LEVEL1;
   }
 }

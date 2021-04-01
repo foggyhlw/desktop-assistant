@@ -21,9 +21,15 @@ char wifi_passwd[] = "1989Fox228";
 #define BRIGHTNESS_AUTO 255
 #define BRIGHTNESS_MANUAL 0
 
-//Brightness Range
+//manual set Brightness Range
 #define BRIGHTNESS_LOW 20
 #define BRIGHTNESS_HIGH 100
+
+//screen light level
+#define BRIGHTNESS_LEVEL1 1
+#define BRIGHTNESS_LEVEL2 2
+#define BRIGHTNESS_LEVEL3 3
+#define BRIGHTNESS_LEVEL4 4
 
 //int convert_lux_to_brightness(int lux);
 String FANS_URL = "http://api.bilibili.com/x/relation/stat?vmid=305218804";
@@ -53,7 +59,9 @@ static unsigned char BILIBILI_BMP_bits[] = {
    0x78, 0x00, 0x00, 0x00, 0xc0, 0x01, 0xe0, 0xff, 0xff, 0xff, 0xff, 0x00,
    0xc0, 0xff, 0xff, 0xff, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-#define MODE_NUM 3
+
+#define MODE_NUM 4   //number of modes
+#define TEMP_HUMI_MODE 3
 #define BILIBILI_MODE 1
 #define TIME_MODE 2
 #define CHANGE_MOD 0
