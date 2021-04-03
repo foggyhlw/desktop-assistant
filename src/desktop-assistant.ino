@@ -93,7 +93,7 @@ CHOOSE(effect_mode, effectMenu, " -EFFECT", doNothing, noEvent, noStyle
        , VALUE(" RAINBOW", 1, doNothing, noEvent)
        , VALUE(" PALETTE", 2, doNothing, noEvent)
        , VALUE(" DOTBEAT", 3, doNothing, noEvent)
-       , VALUE("  BLUR", 4, doNothing, noEvent)
+       , VALUE(" BLUR", 4, doNothing, noEvent)
       );
 
 
@@ -116,7 +116,7 @@ doNothing, noEvent, noStyle
     //  , EDIT("LUX: ",current_lux_str, validators, doNothing, noEvent, noStyle)
      , SUBMENU(setMonitorControlMode)
      //to decide whitch event to use
-     , FIELD(brightness, " -BRIGHTNESS", "%", BRIGHTNESS_LOW, BRIGHTNESS_HIGH, 10, 1, update_brightness_cmd, updateEvent , noStyle)
+     , FIELD(brightness, " -BRIGHTNESS", "LEV", BRIGHTNESS_LOW, BRIGHTNESS_HIGH, 1, 1, update_brightness_cmd, updateEvent , noStyle)
     //  , OP("Lux:", showEvent, anyEvent)
     //  , OP("Sub2", showEvent, anyEvent)
     //  , OP("Sub3", showEvent, anyEvent)
@@ -238,13 +238,15 @@ result screen_saver(menuOut &o, idleEvent e) {
   if (screen_saver_mode == TEMP_HUMI_MODE){
     u8g2.setFont(mediumFont);
     u8g2.setCursor(0,20);
+    u8g2.print(" Environment");
+    u8g2.setCursor(0,40);
     u8g2.print("Temp: ");
     u8g2.print(temperature);
-    u8g2.println(" °C");
-    u8g2.setCursor(0,40);
-    u8g2.print("Humi: ");
-    u8g2.println(" %");
+    u8g2.println(" C");
+    u8g2.setCursor(0,60);
+    u8g2.print("Humi:   ");
     u8g2.println(humidity);
+    u8g2.println(" %");
     u8g2.setFont(defaultFont);
   }
     // switch (e) {

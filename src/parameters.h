@@ -22,8 +22,8 @@ char wifi_passwd[] = "1989Fox228";
 #define BRIGHTNESS_MANUAL 0
 
 //manual set Brightness Range
-#define BRIGHTNESS_LOW 20
-#define BRIGHTNESS_HIGH 100
+#define BRIGHTNESS_LOW 1
+#define BRIGHTNESS_HIGH 4
 
 //screen light level
 #define BRIGHTNESS_LEVEL1 1
