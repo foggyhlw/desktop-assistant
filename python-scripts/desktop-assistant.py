@@ -40,7 +40,7 @@ def on_message(client, userdata, msg):
             keyboard.press('f12')
             arm_flag = False
     if (msg.topic == BRIGHTNESS_TOPIC_AUTO ):
-        brightness_now = level_brightness[msg.payload]
+        brightness_now = level_brightness[str(int(msg.payload))]
         if (brightness_now != brightness_last):
             brightness_last = brightness_now
             timer = threading.Timer(3, set_brightness, [brightness_now])
@@ -48,7 +48,7 @@ def on_message(client, userdata, msg):
         else:
             brightness_last = brightness_now
     if (msg.topic == BRIGHTNESS_TOPIC_MANUAL ):
-        brightness_set = level_brightness[msg.payload]
+        brightness_set = level_brightness[str(int(msg.payload))]
         os.popen('monitorian /set {0}'.format(int(brightness_set)))
 
 def set_brightness(brightness_set):
@@ -59,8 +59,6 @@ def set_brightness(brightness_set):
     else:
         timer.cancel()
         
-def level_to_brightness(level):
-
 keyboard.add_hotkey('alt + a', arm_toggle)
 
 client = mqtt.Client()
