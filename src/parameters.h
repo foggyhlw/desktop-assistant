@@ -1,6 +1,3 @@
-char wifi_ssid[] = "foggy_2G";
-char wifi_passwd[] = "1989Fox228";
-
 // pins for spi ssd1306
 #define CS_PIN  -1
 #define RST_PIN 33
@@ -31,8 +28,9 @@ char wifi_passwd[] = "1989Fox228";
 #define BRIGHTNESS_LEVEL3 3
 #define BRIGHTNESS_LEVEL4 4
 
-//int convert_lux_to_brightness(int lux);
-String FANS_URL = "http://api.bilibili.com/x/relation/stat?vmid=305218804";
+// used for getting bilibili fans number
+// tutorial: https://www.bilibili.com/video/BV17V411q7oG?p=2
+String FANS_URL = "http://api.bilibili.com/x/relation/stat?vmid=YOURID";
 
 #define BILIBILI_BMP_width 44
 #define BILIBILI_BMP_height 42

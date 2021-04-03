@@ -34,11 +34,11 @@ BH1750 lightMeter(0x23);
 
 #include "EspMQTTClient.h"
 EspMQTTClient client(
-  "foggy_2G",
-  "1989Fox228",
-  "192.168.0.100",  // MQTT Broker server ip
-  "foggy",   // Can be omitted if not needed
-  "1989228",   // Can be omitted if not needed
+  "YOUR_WIFI_SSID",
+  "YOUR_WIFI_PASSWD",
+  "YOURMQTTIP",  // MQTT Broker server ip
+  "MQTT-USERNAME",   // Can be omitted if not needed
+  "MQTT_PASSWD",   // Can be omitted if not needed
   "TestClient",     // Client name that uniquely identify your device
   1883              // The MQTT port, default to 1883. this line can be omitted
 );
